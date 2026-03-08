@@ -1,6 +1,3 @@
-// Prisma schema for Better Auth
-// https://www.better-auth.com/docs/integrations/prisma
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -21,8 +18,24 @@ model User {
 
   sessions Session[]
   accounts Account[]
+  blogs    Blog[]
 
   @@map("user")
+}
+
+model Blog {
+  id        String  @id @default(cuid())
+  title     String
+  content   String  @db.Text
+  published Boolean @default(true)
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("blog")
 }
 
 model Session {
