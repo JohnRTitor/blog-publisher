@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Geist, Geist_Mono, DM_Sans } from "next/font/google";
 
 import "@workspace/ui/globals.css";
@@ -10,6 +11,11 @@ const fontMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
 });
+
+export const metadata: Metadata = {
+  title: "Blog Publisher",
+  description: "Login and publish your blogs with ease!",
+};
 
 export default function RootLayout({
   children,
