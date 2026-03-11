@@ -49,11 +49,7 @@ export default function RegisterForm() {
       <FieldGroup>
         <form.AppField name="name">
           {(field) => (
-            <field.FormInputField
-              label="Name"
-              placeholder="John Doe"
-              required
-            />
+            <field.FormInputField label="Name" placeholder="John Doe" />
           )}
         </form.AppField>
 

@@ -1,35 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const protectedRoutes = ["/dashboard"];
+const guestOnlyRoutes = ["/login", "/register"];
 
-export default async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-
-  const isProtected = protectedRoutes.some(
-    (route) => pathname === route || pathname.startsWith(`${route}/`)
-  );
-
-  if (!isProtected) {
-    return NextResponse.next();
-  }
-
-  // better-auth stores the session token in a cookie named
-  // "better-auth.session_token" (or "__Secure-better-auth.session_token" when
-  // using HTTPS in production). We check for both variants.
-  const sessionToken =
+function getSessionToken(request: NextRequest): string | undefined {
+  return (
     request.cookies.get("better-auth.session_token")?.value ??
-    request.cookies.get("__Secure-better-auth.session_token")?.value;
+    request.cookies.get("__Secure-better-auth.session_token")?.value
+  );
+}
 
-  if (!sessionToken) {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("callbackUrl", pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-
-  // Validate the session token by calling the better-auth session endpoint.
-  // This ensures expired / revoked tokens are caught, not just missing cookies.
-  const baseUrl =
-    process.env.BETTER_AUTH_URL ?? request.nextUrl.origin;
+async function isValidSession(
+  sessionToken: string,
+  request: NextRequest
+): Promise<boolean> {
+  const baseUrl = process.env.BETTER_AUTH_URL ?? request.nextUrl.origin;
 
   try {
     const response = await fetch(`${baseUrl}/api/auth/get-session`, {
@@ -38,14 +23,50 @@ export default async function middleware(request: NextRequest) {
       },
     });
 
-    if (!response.ok) {
+    return response.ok;
+  } catch {
+    // If the auth server is unreachable, assume the session is valid so we
+    // don't cause redirect loops. The page itself can handle it gracefully.
+    return true;
+  }
+}
+
+function matchesRoutes(pathname: string, routes: string[]): boolean {
+  return routes.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`)
+  );
+}
+
+export default async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  const isProtected = matchesRoutes(pathname, protectedRoutes);
+  const isGuestOnly = matchesRoutes(pathname, guestOnlyRoutes);
+
+  // Nothing to do for routes that aren't in either list
+  if (!isProtected && !isGuestOnly) {
+    return NextResponse.next();
+  }
+
+  const sessionToken = getSessionToken(request);
+
+  // --- Protected routes: must be logged in ---
+  if (isProtected) {
+    if (!sessionToken || !(await isValidSession(sessionToken, request))) {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(loginUrl);
     }
-  } catch {
-    // If the auth server is unreachable, let the request through so the page
-    // can handle it gracefully rather than showing a redirect loop.
+
+    return NextResponse.next();
+  }
+
+  // --- Guest-only routes: must NOT be logged in ---
+  if (isGuestOnly) {
+    if (sessionToken && (await isValidSession(sessionToken, request))) {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+
     return NextResponse.next();
   }
 
