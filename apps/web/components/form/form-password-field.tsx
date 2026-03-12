@@ -12,15 +12,15 @@ import {
   InputGroupInput,
 } from "@workspace/ui/components/input-group";
 
-interface FormPasswordFieldProps extends Omit<
+type FormPasswordFieldProps = Omit<
   React.ComponentProps<"input">,
   "value" | "onChange" | "onBlur" | "type"
-> {
+> & {
   label?: React.ReactNode;
   description?: string;
   className?: string;
   labelClassName?: string;
-}
+};
 
 export function FormPasswordField({
   label = "Password",
