@@ -11,7 +11,7 @@ import LoginForm from "@/components/login-page/login-form";
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-svh items-center justify-center p-6">
+    <div className="flex items-center justify-center p-6">
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="text-xl">Welcome back</CardTitle>

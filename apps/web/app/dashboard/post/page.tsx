@@ -11,7 +11,7 @@ import PostForm from "@/components/post-page/post-form";
 
 export default function PostPage() {
   return (
-    <div className="flex min-h-svh items-center justify-center p-6">
+    <div className="flex items-center justify-center p-6">
       <Card className="w-full max-w-2xl">
         <CardHeader>
           <CardTitle className="text-xl">Create a new post</CardTitle>

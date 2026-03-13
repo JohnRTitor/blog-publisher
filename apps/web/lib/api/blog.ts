@@ -32,6 +32,25 @@ export async function getPublicBlogs(page: number, limit: number) {
   };
 }
 
+export async function getBlogsByAuthorId(authorId: string) {
+  return prisma.blog.findMany({
+    where: {
+      authorId,
+    },
+    include: {
+      author: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+}
+
 export async function createBlog(data: {
   title: string;
   content: string;

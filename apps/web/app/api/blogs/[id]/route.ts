@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { getBlogById } from "@/lib/api/blog";
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const blog = await getBlogById(params.id);
+  const { id } = await params;
+
+  const blog = await getBlogById(id);
 
   if (!blog || !blog.published) {
     return NextResponse.json({ error: "Blog not found" }, { status: 404 });

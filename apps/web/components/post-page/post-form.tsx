@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useAppForm } from "@/lib/form";
 import { createBlogFormSchema } from "@/lib/schema/blog";
+import { createBlogAction } from "@/app/actions/blog";
 import { FieldGroup } from "@workspace/ui/components/field";
 import { toast } from "sonner";
 
@@ -21,28 +22,25 @@ export default function PostForm() {
     },
 
     onSubmit: async ({ value }) => {
-      const response = await fetch("/api/blogs", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(value),
-      });
+      try {
+        const result = await createBlogAction(value);
 
-      if (response.status === 401) {
-        toast.error("You must be signed in to publish a post.");
-        router.push("/login");
-        return;
+        if (!result.success) {
+          if (result.status === 401) {
+            toast.error("You must be signed in to publish a post.");
+            router.push("/login");
+            return;
+          }
+
+          toast.error(result.error);
+          return;
+        }
+
+        toast.success("Blog post published!");
+        router.push("/dashboard");
+      } catch (error) {
+        toast.error("An unexpected error occurred. Please try again.");
       }
-
-      if (!response.ok) {
-        const data = await response.json().catch(() => null);
-        const message =
-          data?.error ?? "Something went wrong. Please try again.";
-        toast.error(message);
-        return;
-      }
-
-      toast.success("Blog post published!");
-      router.push("/dashboard");
     },
   });
 

@@ -5,6 +5,7 @@ import "@workspace/ui/globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { cn } from "@workspace/ui/lib/utils";
 import { Toaster } from "@workspace/ui/components/sonner";
+import Header from "@/components/common/header";
 
 const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -36,7 +37,10 @@ export default function RootLayout({
     >
       <body>
         <ThemeProvider>
-          {children}
+          <div className="min-h-screen bg-background">
+            <Header />
+            <main className="mx-auto max-w-5xl px-6 py-12">{children}</main>
+          </div>
           <Toaster richColors position="top-right" />
         </ThemeProvider>
       </body>
