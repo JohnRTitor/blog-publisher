@@ -76,45 +76,6 @@ export default function Home() {
           />
         </div>
       </div>
-      <div className="mt-10 ml-5 grid grid-cols-2 gap-5">
-        <div>
-          <Accordion type="single" collapsible className="w-full">
-            {features.map((feature, index) => (
-              <AccordionItem key={index} value={index.toString()}>
-                <AccordionTrigger className="flex justify-between [&[data-state=open]>svg]:rotate-180">
-                  {feature.title}
-                </AccordionTrigger>
-
-                <AccordionContent>{feature.desc}</AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </div>
-
-        <div className="relative h-[350px] w-full">
-          <Image
-            src="/images/scene.jpg"
-            alt="scene"
-            fill
-            className="rounded-xl object-cover"
-          />
-        </div>
-      </div>
-      {/* POPULAR BLOGS */}
-      <div className="mx-auto mt-12 max-w-5xl p-4">
-        <h2 className="mb-4 text-2xl font-bold">Popular Blogs</h2>
-
-        <div className="grid gap-4 md:grid-cols-3">
-          {[1, 2, 3].map((item) => (
-            <Card key={item}>
-              <CardContent className="p-4">
-                <h3 className="font-semibold">Blog {item}</h3>
-                <p className="text-sm text-gray-500">Description...</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
 
       <div className="mt-10 ml-5 grid grid-cols-2 gap-5">
         <div className="mt-25">
@@ -129,9 +90,11 @@ export default function Home() {
           </p>
           <div className="mt-5">
             <Popover>
-              <PopoverTrigger>
-                <Button className="h-20 w-80 text-2xl">Get Started</Button>
-              </PopoverTrigger>
+              <PopoverTrigger
+                render={
+                  <Button className="h-20 w-80 text-2xl">Get Started</Button>
+                }
+              />
 
               <PopoverContent className="w-80 space-y-3">
                 <h2 className="font-semibold text-white">
@@ -174,6 +137,45 @@ export default function Home() {
               <p>4. Share your blog.</p>
             </CardContent>
           </Card>
+        </div>
+      </div>
+      {/* POPULAR BLOGS */}
+      <div className="mx-auto mt-12 max-w-5xl p-4">
+        <h2 className="mb-4 text-2xl font-bold">Popular Blogs</h2>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          {[1, 2, 3].map((item) => (
+            <Card key={item}>
+              <CardContent className="p-4">
+                <h3 className="font-semibold">Blog {item}</h3>
+                <p className="text-sm text-gray-500">Description...</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+      <div className="mt-10 ml-5 grid grid-cols-2 gap-5">
+        <div>
+          <Accordion defaultValue={["item-0"]} className="w-full">
+            {features.map((feature, index) => (
+              <AccordionItem key={index} value={`item-${index}`}>
+                <AccordionTrigger className="flex justify-between text-3xl hover:no-underline [&[data-state=open]>svg]:rotate-180">
+                  {feature.title}
+                </AccordionTrigger>
+
+                <AccordionContent>{feature.desc}</AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
+
+        <div className="relative h-[350px] w-full">
+          <Image
+            src="/images/scene.jpg"
+            alt="scene"
+            fill
+            className="rounded-xl object-cover"
+          />
         </div>
       </div>
     </div>
