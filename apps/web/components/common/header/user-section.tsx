@@ -9,7 +9,6 @@ import {
   DropdownMenuGroup,
   DropdownMenuLabel,
   DropdownMenuItem,
-  DropdownMenuSeparator,
 } from "@workspace/ui/components/dropdown-menu";
 import { PenLineIcon, User2Icon } from "lucide-react";
 import Link from "next/link";
