@@ -6,12 +6,28 @@ import { auth } from "@/lib/auth";
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
 
-  const page = Number(searchParams.get("page") ?? "1");
-  const limit = Number(searchParams.get("limit") ?? "10");
+  const page = Math.max(1, Number(searchParams.get("page") ?? "1") || 1);
+  const limit = Math.min(100, Math.max(1, Number(searchParams.get("limit") ?? "10") || 10));
 
-  const result = await getPublicBlogs(page, limit);
+  // Optional filters
+  const authorId = searchParams.get("authorId") ?? undefined;
+  const authorName = searchParams.get("authorName") ?? undefined;
+  const search = searchParams.get("search") ?? undefined;
 
-  return NextResponse.json(result);
+  try {
+    const result = await getPublicBlogs(page, limit, {
+      authorId,
+      authorName,
+      search,
+    });
+
+    return NextResponse.json(result);
+  } catch {
+    return NextResponse.json(
+      { error: "Failed to fetch blogs" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -23,18 +39,36 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await request.json();
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { error: "Invalid JSON body" },
+      { status: 400 }
+    );
+  }
 
   const parsed = createBlogSchema.safeParse(body);
 
   if (!parsed.success) {
-    return NextResponse.json({ error: "Validation failed" }, { status: 422 });
+    return NextResponse.json(
+      { error: "Validation failed", details: parsed.error.issues },
+      { status: 422 }
+    );
   }
 
-  const blog = await createBlog({
-    ...parsed.data,
-    authorId: session.user.id,
-  });
+  try {
+    const blog = await createBlog({
+      ...parsed.data,
+      authorId: session.user.id,
+    });
 
-  return NextResponse.json(blog, { status: 201 });
+    return NextResponse.json(blog, { status: 201 });
+  } catch {
+    return NextResponse.json(
+      { error: "Failed to create blog" },
+      { status: 500 }
+    );
+  }
 }

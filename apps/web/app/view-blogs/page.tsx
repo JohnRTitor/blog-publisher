@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ViewBlogsPage() {
-  const { blogs, total } = await getPublicBlogs(1, 50);
+  const { data: blogs, pagination: { total } } = await getPublicBlogs(1, 50);
 
   return (
     <>
