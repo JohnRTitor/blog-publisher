@@ -1,6 +1,6 @@
-"use server";
+"use client";
 
-import { getCurrentSession, signOutAction } from "@/app/actions/session";
+import { useSession, signOut } from "@/lib/auth-client";
 import { Button } from "@workspace/ui/components/button";
 import {
   DropdownMenu,
@@ -10,11 +10,22 @@ import {
   DropdownMenuLabel,
   DropdownMenuItem,
 } from "@workspace/ui/components/dropdown-menu";
-import { PenLineIcon, User2Icon } from "lucide-react";
+import { User2Icon } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-export default async function HeaderUserSection() {
-  const session = await getCurrentSession();
+export default function HeaderUserSection() {
+  const { data: session, isPending } = useSession();
+  const router = useRouter();
+
+  // While loading, show a minimal placeholder to avoid layout shift
+  if (isPending) {
+    return (
+      <Button variant="ghost" size="sm" disabled>
+        <User2Icon className="opacity-50" />
+      </Button>
+    );
+  }
 
   if (!session) {
     return (
@@ -25,27 +36,28 @@ export default async function HeaderUserSection() {
   }
 
   return (
-    <div>
-      <DropdownMenu>
-        <DropdownMenuTrigger render={<Button variant="ghost" />}>
-          <User2Icon />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuGroup>
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-            <DropdownMenuItem>
-              <Link href="/dashboard">Dashboard</Link>
-            </DropdownMenuItem>
-            <form action={signOutAction}>
-              <button type="submit">
-                <DropdownMenuItem className="cursor-pointer">
-                  Sign out
-                </DropdownMenuItem>
-              </button>
-            </form>
-          </DropdownMenuGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger render={<Button variant="ghost" />}>
+        <User2Icon />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuItem>
+            <Link href="/dashboard">Dashboard</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onSelect={async () => {
+              await signOut();
+              router.push("/login");
+              router.refresh();
+            }}
+          >
+            Sign out
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
