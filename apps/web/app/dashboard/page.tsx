@@ -1,61 +1,47 @@
-"use client";
+import { Sidebar } from "@/components/dashboard-section/sidebar";
+import { StatsCards } from "@/components/dashboard-section/stats-cards";
+import { AnalyticsChart } from "@/components/dashboard-section/analytics-chart";
+import { RecentPosts } from "@/components/dashboard-section/recent-posts";
+import { TopPosts } from "@/components/dashboard-section/top-posts";
+import { ActivityFeed } from "@/components/dashboard-section/activity-feed";
 
-import { useRouter } from "next/navigation";
-import { useSession, signOut } from "@/lib/auth-client";
-import { Button } from "@workspace/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card";
-
-export default function DashboardPage() {
-  const router = useRouter();
-  const { data: session, isPending } = useSession();
-
-  if (isPending) {
-    return (
-      <div className="flex min-h-svh items-center justify-center p-6">
-        <p className="text-sm text-muted-foreground">Loading…</p>
-      </div>
-    );
-  }
-
-  // Middleware guarantees a valid session before this page renders.
-  // This is a defensive fallback that should rarely be hit.
-  if (!session) {
-    router.push("/login");
-    return null;
-  }
-
+export default function Dashboard() {
   return (
-    <div className="flex min-h-svh items-center justify-center p-6">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle className="text-xl">Hello, {session.user.name}</CardTitle>
-          <CardDescription>
-            Welcome! You have now been logged in.
-            <br />
-            Your email: {session.user.email} <br />
-            Account created at: {session.user.createdAt.toDateString()} <br />
-            Last details updated at: {session.user.updatedAt.toDateString()}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={async () => {
-              await signOut();
-              router.push("/login");
-            }}
-          >
-            Sign out
-          </Button>
-        </CardContent>
-      </Card>
+    <div className="min-h-screen bg-background">
+      <Sidebar />
+
+      <div className="lg:pl-64">
+        <main className="p-4 lg:p-6">
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+            <p className="text-muted-foreground">
+              Welcome back! Here&apos;s an overview of your blog.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <StatsCards />
+
+            <div className="grid gap-6 lg:grid-cols-3">
+              <div className="lg:col-span-2">
+                <AnalyticsChart />
+              </div>
+              <div>
+                <TopPosts />
+              </div>
+            </div>
+
+            <div className="grid gap-6 lg:grid-cols-3">
+              <div className="lg:col-span-2">
+                <RecentPosts />
+              </div>
+              <div>
+                <ActivityFeed />
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
