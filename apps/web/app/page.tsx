@@ -1,4 +1,6 @@
 "use client";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import Image from "next/image";
 import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent } from "@workspace/ui/components/card";
@@ -16,6 +18,20 @@ import {
 } from "@workspace/ui/components/popover";
 
 export default function Home() {
+  const router = useRouter();
+  const [query, setQuery] = useState("");
+  const categories = [
+    "Programming",
+    "Lifestyle",
+    "Music",
+    "Beauty",
+    "Gaming",
+    "Art and Craft",
+  ];
+  const filtered = categories.filter((item) =>
+    item.toLowerCase().includes(query.toLowerCase())
+  );
+
   const features = [
     {
       title: "Blog beautifully",
@@ -40,7 +56,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-800">
+    <div className="min-h-screen bg-linear-to-r from-pink-400 via-pink-300 to-yellow-200">
       {/* HERO */}
       <div className="relative flex h-[500px] items-center justify-center text-center">
         <Image
@@ -59,15 +75,15 @@ export default function Home() {
 
       <div>
         <div>
-          <p className="justify-left mt-10 ml-5 flex text-5xl">
+          <p className="justify-left mt-10 ml-5 flex text-5xl font-bold text-blue-950">
             Start simple. Grow limitless.
           </p>
-          <p className="justify-left mt-5 ml-10 flex text-2xl">
+          <p className="justify-left mt-5 ml-10 flex text-2xl text-black">
             From your first post to a full content platform, build, customize,
             and scale your blog effortlessly.
           </p>
         </div>
-        <div className="relative mt-10 h-[400px] w-full">
+        <div className="relative mt-10 ml-10 h-[400px] w-[650px]">
           <Image
             src="/images/publish.webp"
             alt="pub"
@@ -79,17 +95,18 @@ export default function Home() {
 
       <div className="mt-10 ml-5 grid grid-cols-2 gap-5">
         <div className="mt-25">
-          <p className="text-5xl">
+          <p className="text-5xl font-bold text-purple-900">
             How to <br />
             create a blog <br />
             for free
           </p>
           <br />
-          <p className="text-2xl">
+          <p className="text-2xl text-black">
             Follow these 4 steps to start building your blog today.
           </p>
           <div className="mt-5">
             <Popover>
+              {/* FIXED TRIGGER */}
               <PopoverTrigger
                 render={
                   <Button className="h-20 w-80 text-2xl">Get Started</Button>
@@ -97,30 +114,33 @@ export default function Home() {
               />
 
               <PopoverContent className="w-80 space-y-3">
-                <h2 className="font-semibold text-white">
-                  What's on your mind?
-                </h2>
+                <h2 className="font-semibold">What's on your mind?</h2>
 
-                <Input placeholder="Search..." />
+                {/* INPUT */}
+                <Input
+                  placeholder="Search..."
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
 
+                {/* FILTERED LIST */}
                 <ul className="space-y-1 rounded border p-2">
-                  {["Programming", "Lifestyle", "Music", "Beauty"].map(
-                    (item) => (
-                      <li
-                        key={item}
-                        className="cursor-pointer rounded p-1 text-white hover:bg-gray-100"
-                      >
-                        {item}
-                      </li>
-                    )
-                  )}
+                  {filtered.map((item) => (
+                    <li
+                      key={item}
+                      onClick={() => router.push(`/login`)}
+                      className="cursor-pointer rounded p-1 font-bold hover:bg-white hover:text-black"
+                    >
+                      {item}
+                    </li>
+                  ))}
                 </ul>
               </PopoverContent>
             </Popover>
           </div>
         </div>
         <div className="px-5 py-5">
-          <Card className="transition duration-300 hover:-translate-y-2 hover:shadow-xl">
+          <Card className="bg-pink-800 transition duration-300 hover:-translate-y-2 hover:shadow-xl">
             <CardContent className="px-8 py-8 text-2xl">
               <p>1. Sign up for a free blog maker like Blog Publisher.</p>
               <br />
@@ -140,15 +160,15 @@ export default function Home() {
         </div>
       </div>
       {/* POPULAR BLOGS */}
-      <div className="mx-auto mt-12 max-w-5xl p-4">
+      <div className="mx-auto mt-12 max-w-5xl p-4 text-blue-950">
         <h2 className="mb-4 text-2xl font-bold">Popular Blogs</h2>
 
         <div className="grid gap-4 md:grid-cols-3">
           {[1, 2, 3].map((item) => (
-            <Card key={item}>
+            <Card key={item} className="bg-green-100">
               <CardContent className="p-4">
-                <h3 className="font-semibold">Blog {item}</h3>
-                <p className="text-sm text-gray-500">Description...</p>
+                <h3 className="font-semibold text-pink-800">Blog {item}</h3>
+                <p className="text-sm text-gray-800">Description...</p>
               </CardContent>
             </Card>
           ))}
@@ -159,17 +179,19 @@ export default function Home() {
           <Accordion defaultValue={["item-0"]} className="w-full">
             {features.map((feature, index) => (
               <AccordionItem key={index} value={`item-${index}`}>
-                <AccordionTrigger className="flex justify-between text-3xl hover:no-underline [&[data-state=open]>svg]:rotate-180">
+                <AccordionTrigger className="flex justify-between text-2xl font-bold text-blue-950 hover:no-underline [&[data-state=open]>svg]:rotate-180">
                   {feature.title}
                 </AccordionTrigger>
 
-                <AccordionContent>{feature.desc}</AccordionContent>
+                <AccordionContent className="text-blue-900">
+                  {feature.desc}
+                </AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
         </div>
 
-        <div className="relative h-[350px] w-full">
+        <div className="relative h-[350px] w-[300px]">
           <Image
             src="/images/scene.jpg"
             alt="scene"

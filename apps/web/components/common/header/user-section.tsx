@@ -26,13 +26,6 @@ export default async function HeaderUserSection() {
 
   return (
     <div>
-      <Button size="sm">
-        <Link href="/dashboard/post" className="flex items-center gap-1.5">
-          <PenLineIcon className="size-3.5" />
-          Write
-        </Link>
-      </Button>
-
       <DropdownMenu>
         <DropdownMenuTrigger render={<Button variant="ghost" />}>
           <User2Icon />
